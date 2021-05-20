@@ -5,44 +5,47 @@ import time
 
 
 
-fname = "scraperlog"
-
 
 RELAY = 18 # BCM 18, GPIO.1 physical pin 12
+# Relay is connected NORMALLY CLOSED so gpio.cleanup() leaves it SET.
+# set RELAY TRUE to TURN OFF
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(RELAY,GPIO.OUT)
 
-try:
-     while True:
+fname = "scraperlog"
+threshold = 1000
 
-          GPIO.output(RELAY,True)
-          print("high")
-          time.sleep(1.0)
-          GPIO.output(RELAY,False)
-          print("low")
-          time.sleep(1.0)
-except KeyboardInterrupt:
 
-     GPIO.cleanup()               # clean up after yourself
-     print("interrupted")
-     exit(0)
-    
+
+# power on on startup
+GPIO.output(RELAY,False)
+
+# read in file of scraped outage data    
 with open(fname,'r') as fh:
      all_lines = fh.readlines()
 
-for i, line in enumerate(all_lines):
-     fields = line.split()
-     time_str = fields[2]
-     try:
-          outages = int(fields[5])
-     except ValueError:
-          print("couyld not convert outage value")
-     print("{} {}".format(time_str, outages))
-     if outages > threshold:
-          print("above threshold")
-     else:
-          print("below threshold")
-     if i > 10:
-          break
+try:
+     for i, line in enumerate(all_lines):
+          fields = line.split()
+          time_str = fields[2]
+          try:
+               outages = int(fields[5].replace(',',""))
+          except ValueError:
+               print("couyld not convert outage value")
+          print("{} {}".format(time_str, outages))
+          if outages > threshold:
+               print("above threshold")
+               GPIO.output(RELAY,True)
+          else:
+               print("below threshold")
+               GPIO.output(RELAY,False)
+          if i > 10:
+               break
+          time.sleep(1.0)
+
+except KeyboardInterrupt:
+     print("interrupted")
+
+GPIO.cleanup()               # clean up after yourself
 exit(0)
 
