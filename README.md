@@ -9,9 +9,7 @@ Obtain Texas utility customer outage data from https://poweroutage.us/area/utili
 */5 * * * * python3 /home/pi/gith/powerscraper/bs.py >> ~/scraperlog 2>&1
 ```
 
-`canned-demo.py` -- run this to read data from `scraperlog` text file, remember to `gunzip scraperlog.gz` to uncompress the data. If not running on a Raspberry Pi with GPIO support, use a command-line option like `--dry-run` to ignore the hardware. 
+`demo.py` -- Actual live demo, scrapes data from URL above, and turns on a raspberry Pi GPIO.1 (physical pin 12) to trigger power cut relay. Works on Python 2.7 currently standard on Rpi.
 
-`demo.py` -- Actual live demo, scrapes data from URL above, and turns on a raspberry Pi GPIO.1 (physical pin 12) to trigger power cut relay
-
-`canned-demo.py` -- run this to read data from `scraperlog` text file; run `gunzip scraperlog.gz` to uncompress the data. If not running on a Raspberry Pi with GPIO support, use a command-line option like `--dry-run` to ignore the hardware. 
+`canned-demo.py` -- run this to read data from `scraperlog` text file; run `gunzip scraperlog.gz` to uncompress the data. If not running on a Raspberry Pi with GPIO support, use a command-line option like `--dry-run` to ignore the hardware. Works on Python 2 and Python 3. 
 
