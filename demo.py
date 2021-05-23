@@ -14,8 +14,12 @@ from __future__ import division
 
 import RPi.GPIO as GPIO
 import time
-from urllib import urlopen
-#from urllib.request import urlopen  # py3
+try:
+     from urllib import urlopen
+except ImportError:
+     # python 3
+     from urllib.request import urlopen  
+
 from datetime import datetime
 import time
 import sys
@@ -27,8 +31,16 @@ from bs4 import BeautifulSoup
 
 
 url = "https://poweroutage.us/area/utility/380"
+
 threshold = 350
 
+if len(sys.argv) > 1:
+     try:
+          threshold = int(sys.argv[1])
+     except ValueError:
+          print("could not parse threshold value {}".format(sys.argv[1]))
+
+print("Running demo at power-off threshold {}".format(threshold))
 
 def get_outage_data(url):
      #print("scraping {}".format(url))
