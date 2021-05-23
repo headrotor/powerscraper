@@ -27,15 +27,11 @@ from bs4 import BeautifulSoup
 
 
 url = "https://poweroutage.us/area/utility/380"
-threshold = 500
+threshold = 350
 
 
 def get_outage_data(url):
-     print("scraping {}".format(url))
-#sys.stdout.flush()
-
-
-
+     #print("scraping {}".format(url))
      page = urlopen(url)
      html = page.read().decode("utf-8")
      soup = BeautifulSoup(html, "html.parser")
@@ -73,12 +69,12 @@ try:
      while True:
           time_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
           outages = get_outage_data(url)
-          print("{} {}".format(time_str, outages))
+          print("{} customer outages: {}".format(time_str, outages))
           if outages > threshold:
-               print("above threshold")
+               print("above threshold: POWER OFF")
                GPIO.output(RELAY,True)
           else:
-               print("below threshold")
+               print("below outage threshold of {}".format(threshold))
                GPIO.output(RELAY,False)
           time.sleep(300.0)
 
