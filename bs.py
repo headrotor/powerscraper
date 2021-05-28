@@ -27,7 +27,7 @@ for row in rows:
     if len(eldata) == 3:
         data.append(eldata)
 
-print(len(data))
+# extract county data from tables
 for d in data:
     print("{}, ".format(d[0]),end="")
 print(" counties")
