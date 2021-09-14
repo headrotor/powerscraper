@@ -136,7 +136,6 @@ counties_per_line = 5
 thresh = 0.01   
 
 
-
 # extract the data from the urls
 county_dict, data = get_data(url)
 
@@ -146,31 +145,9 @@ print_formatted(county_dict, thresh, county_codes, counties_per_line)
 
 #
 if test_threshold(county_dict, thresh):
-    print("**POWER OFF** (ABOVE THRESHOLD)")
+    print("\n\n\n**POWER OFF** (ABOVE THRESHOLD)")
     # set the GPIO to turn the power off here
 else:
-    print("**POWER ON** (BELOW THRESHOLD)")
+    print("\n\n\n**POWER ON** (BELOW THRESHOLD)")
     # set the GPIO to turn the power on here
-
-
-
-exit(0)
-
-# store county, outage data in a dict
-
-#for d in data:
-#    print("{}, ".format(str(d[2])))
-
-#print(data)
-
-for line in text.split("\n"):
-    if len(line.strip()) > 0:
-        words = line.split()
-        if len(words) == 3:
-            if words[1] == 'Outages:':
-
-                print("{} {} {}".format(time.time(),
-                                        datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                                        line.strip()))
-                sys.stdout.flush()
 
