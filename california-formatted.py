@@ -24,7 +24,7 @@ def print_formatted(county_dict, thresh, codes, counties_per_line):
         # format county item as code followed by percent outage
         item = "{:} ({:2.1f}%)".format(ccode, 100*county_dict[key])
         if county_dict[key] > thresh:
-            # above threshold, add red display escapes
+            # above threshold, add ANSI escape codes for red terminal text
             item = "\033[31;1;4m" + item + "\033[0m"
         outline += item + "  "
         county_count += 1
