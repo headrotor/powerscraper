@@ -22,11 +22,11 @@ def print_formatted(county_dict, thresh, codes, counties_per_line):
         except KeyError: # if county not in code dict, uppercase first 3 char
             ccode = key.upper()[0:3] 
         # format county item as code followed by percent outage
-        item = "{:} ({:2.1f}%) ".format(ccode, 100*county_dict[key])
+        item = "{:} ({:2.1f}%)".format(ccode, 100*county_dict[key])
         if county_dict[key] > thresh:
             # above threshold, add red display escapes
             item = "\033[31;1;4m" + item + "\033[0m"
-        outline += item
+        outline += item + "  "
         county_count += 1
         if county_count > counties_per_line:
             print(outline)
@@ -68,8 +68,19 @@ def get_data(url):
                 data_dict[d[0]] = num/denom
             else:
                 print("zero customers in county:" + d[0])
-    return(data_dict, data)
+    return(data_dict, text)
 
+
+def print_customers(text):
+    for line in text.splitlines():
+        if line[0:10] == "Pacific Ga" and len(line) > 40:
+            print(line)
+        if line[0:10] == "Customers ":
+            print(line)
+        if line[0:10] == "Utility Ou":
+            print(line)
+        if line[0:10] == "Last Updat":
+            print(line)
 
 county_codes = {
     "Alameda": "ALA",
@@ -137,17 +148,21 @@ thresh = 0.01
 
 
 # extract the data from the urls
-county_dict, data = get_data(url)
+county_dict, text = get_data(url)
 
+# print the top decoration text
+print_customers(text)
 
-# print the formatted data
+# print the formatted county data
+print("\n\nCounty Outages:")
 print_formatted(county_dict, thresh, county_codes, counties_per_line)
+print("\n\n")
 
-#
+
 if test_threshold(county_dict, thresh):
-    print("\n\n\n**POWER OFF** (ABOVE THRESHOLD)")
+    print("   **POWER OFF** (ABOVE THRESHOLD)")
     # set the GPIO to turn the power off here
 else:
-    print("\n\n\n**POWER ON** (BELOW THRESHOLD)")
+    print("   **POWER ON** (BELOW THRESHOLD)")
     # set the GPIO to turn the power on here
 
