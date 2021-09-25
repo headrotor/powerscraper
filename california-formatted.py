@@ -16,13 +16,14 @@ def print_formatted(county_dict, thresh, codes, counties_per_line):
     """Given county outage data in a dict, format and print it. """
     outline = ""
     county_count = 0
-    for key in county_dict:
+
+    for key, val in  sorted(county_dict.items(), key = lambda x:x[0]):
         try:
             ccode = codes[key]
         except KeyError: # if county not in code dict, uppercase first 3 char
             ccode = key.upper()[0:3] 
         # format county item as code followed by percent outage
-        item = "{:} ({:2.1f}%)".format(ccode, 100*county_dict[key])
+        item = "{:} ({:2.1f}%)".format(ccode, 100*val)
         if county_dict[key] > thresh:
             # above threshold, add ANSI escape codes for red terminal text
             item = "\033[31;1;4m" + item + "\033[0m"
@@ -32,7 +33,10 @@ def print_formatted(county_dict, thresh, codes, counties_per_line):
             print(outline)
             outline = ""
             county_count = 0
+    # BUGFIX: add this line here
+    print(outline)
 
+            
 def get_data(url):
     """scrape outatage data from given url, return as list and county dict"""
     page = urlopen(url)
