@@ -24,21 +24,36 @@ authkey = authkey.strip()
 # example response
 #{'CountyByUtilityId': 6727, 'CountyId': 3402, 'UtilityId': 760, 'StateId': 6, '#CountyName': 'Sierra', 'CustomersTracked': 5555, 'CustomersOut': 0, 'LastUpdate#dDateTime': '2022-10-13T17:07:14Z'}
 
-api_url="https://poweroutage.us/api/json_v1.6/utility?key={}&utilityid=380".format(authkey)
+api_url="https://poweroutage.us/api/json_v1.6/countybyutility?key={}&utilityid=380".format(authkey)
 
+print(api_url)
 
 response = requests.get(api_url)
 # might want to check for response == 200 here but YOLO
 
 # response is a list of dicts, one per county (JSON already parsed!)
+counties = []
+outages = []
+total_outages = 0
 for resp_dict in response.json():
     #print(resp_dict)
     # if county_dict['US_County_FIPS'] is not None:
     #     print(county_dict['CountyName'])
-    outages = resp_dict['CustomersOut']
-    
+    counties.append(resp_dict['CountyName'])    
+    outage_int = int(resp_dict['CustomersOut'])
+    outages.append(outage_int)
+    total_outages += outage_int
 
-text = "Utility Outages: {}".format(outages)
+for c in counties:
+    print(c + ", ", end="")
+print("counties")
+
+for o in outages:
+    print(str(o) + ", ", end="")
+print("outages")
+
+    
+text = "Utility Outages: {}".format(total_outages)
 
 for line in text.split("\n"):
     if len(line.strip()) > 0:
