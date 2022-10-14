@@ -12,7 +12,7 @@ try:
     with open('authkey.txt') as fp:
         authkey = fp.read()
 except FileNotFoundError:
-    print(f'authorization key file not found:\ncreate "{authkey_file}" with api key')
+    print('authorization key file not found:\ncreate "{}" with api key'.format(authkey_file))
     exit()
 authkey = authkey.strip()
 
@@ -24,7 +24,7 @@ authkey = authkey.strip()
 # example response
 #{'CountyByUtilityId': 6727, 'CountyId': 3402, 'UtilityId': 760, 'StateId': 6, '#CountyName': 'Sierra', 'CustomersTracked': 5555, 'CustomersOut': 0, 'LastUpdate#dDateTime': '2022-10-13T17:07:14Z'}
 
-api_url=f"https://poweroutage.us/api/json_v1.6/utility?key={authkey}&utilityid=380"
+api_url="https://poweroutage.us/api/json_v1.6/utility?key={}&utilityid=380".format(authkey)
 
 
 response = requests.get(api_url)
