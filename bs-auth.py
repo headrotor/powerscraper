@@ -7,7 +7,8 @@ import sys
 
 # store authorization key in local file so we
 # don't check it in to github
-authkey_file = 'authkey.txt'
+authkey_file = '/home/pi/gith/powerscraper/authkey.txt'
+#authkey_file = 'authkey.txt'
 try:
     with open('authkey.txt') as fp:
         authkey = fp.read()
@@ -26,7 +27,6 @@ authkey = authkey.strip()
 
 api_url="https://poweroutage.us/api/json_v1.6/countybyutility?key={}&utilityid=380".format(authkey)
 
-print(api_url)
 
 response = requests.get(api_url)
 # might want to check for response == 200 here but YOLO
