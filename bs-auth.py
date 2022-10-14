@@ -8,8 +8,12 @@ import sys
 # store authorization key in local file so we
 # don't check it in to github
 authkey_file = 'authkey.txt'
-with open('authkey.txt') as fp:
-    authkey = fp.read()
+try:
+    with open('authkey.txt') as fp:
+        authkey = fp.read()
+except FileNotFoundError:
+    print(f'authorization key file not found:\ncreate "{authkey_file}" with api key')
+    exit()
 authkey = authkey.strip()
 
 # Create JSON API url from authkey. California is stateid=6
