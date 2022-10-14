@@ -38,7 +38,7 @@ for resp_dict in response.json():
     outages = resp_dict['CustomersOut']
     
 
-text = f"Utility Outages: {outages}"
+text = "Utility Outages: {}".format(outages)
 
 for line in text.split("\n"):
     if len(line.strip()) > 0:
