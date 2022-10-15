@@ -1,8 +1,9 @@
-from bs4 import BeautifulSoup
-from urllib.request import urlopen
 from datetime import datetime
+import os
 import time
 import sys
+import requests
+
 
 def test_threshold(county_dict, thresh):
     """ given a dict of county data, return True if any county with 
@@ -33,58 +34,45 @@ def print_formatted(county_dict, thresh, codes, counties_per_line):
             print(outline)
             outline = ""
             county_count = 0
-    # BUGFIX: add this line here
     print(outline)
 
-            
-def get_data(url):
-    """scrape outatage data from given url, return as list and county dict"""
-    page = urlopen(url)
-    html = page.read().decode("utf-8")
-    soup = BeautifulSoup(html, "html.parser")
 
-    text = soup.get_text()
+def get_utility_data(utl_url):
+    """ return formatted utility name with number of customers""" 
 
-    table = soup.find("table", { "class" : "table-striped" })
+    
+def get_data(api_url):
+    """get data from given url, return as dict of outage percentages
+    keyed by county name"""
 
-    data = []
-    #table_body = table.find('tbody')
+    response = requests.get(api_url)
+    # might want to check for response == 200 here but YOLO
 
-    rows = table.find_all('tr')
-    for row in rows:
-        cols = row.find_all('td')
-        cols = [ele.text.strip() for ele in cols]
-        eldata = [ele for ele in cols if ele]
-        if len(eldata) == 3:
-            data.append(eldata)
+    
 
-    # extract county data from tables
     data_dict = {}
-    for d in data:
-        #print("{}, ".format(d[0]),end="")
-        try:
-            num = float(d[2].replace(",",""))
-            denom = float(d[1].replace(",",""))
-        except ValueError:
-            print("error converting outage values")
+    for resp_dict in response.json():
+        #print(resp_dict)
+
+        outage_f = float(resp_dict['CustomersOut'])
+        customer_f = float(resp_dict['CustomersTracked'])
+        if customer_f > 0.0:
+            data_dict[resp_dict['CountyName']] = outage_f/customer_f
         else:
-            if denom > 0:
-                data_dict[d[0]] = num/denom
-            else:
-                print("zero customers in county:" + d[0])
-    return(data_dict, text)
+            data_dict[resp_dict['CountyName']] = 0.0
+
+    return(data_dict)
 
 
-def print_customers(text):
-    for line in text.splitlines():
-        if line[0:10] == "Pacific Ga" and len(line) > 40:
-            print(line)
-        if line[0:10] == "Customers ":
-            print(line)
-        if line[0:10] == "Utility Ou":
-            print(line)
-        if line[0:10] == "Last Updat":
-            print(line)
+def print_customers(utl_url):
+    response = requests.get(utl_url)    
+    rj = response.json()[0]
+    
+    print("{}".format(rj['UtilityName']))
+    print("Customers: {}".format(rj['CustomersTracked']))
+    print("Utility Outages: {}".format(rj['CustomersOut']))
+    print("Last Updated Time: {}".format(rj['LastUpdatedDateTime']))
+
 
 county_codes = {
     "Alameda": "ALA",
@@ -143,8 +131,33 @@ county_codes = {
 
 #### Everything happens here
 
-# 380 is Texas, 760 is PG&E
-url = "https://poweroutage.us/area/utility/760"
+
+# first change to home directory so auth file is local 
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+# store authorization key in local file so we
+# don't check it in to github
+#authkey_file = '/home/pi/gith/powerscraper/authkey.txt'
+authkey_file = 'authkey.txt'
+# read in auth key from file 
+try:
+    with open('authkey.txt') as fp:
+        authkey = fp.read()
+except FileNotFoundError:
+    print('authorization key file not found:\ncreate "{}" with api key'.format(authkey_file))
+    exit()
+authkey = authkey.strip()
+
+# Create JSON API url from authkey. 
+# texas is utility 380, PGE is utility 760
+api_url="https://poweroutage.us/api/json_v1.6/countybyutility?key={}&utilityid=760".format(authkey)
+
+
+# create utility info URL from authkey
+utl_url="https://poweroutage.us/api/json_v1.6/utility?key={}&utilityid=760".format(authkey)
+
+
+
 # print this many counties per line
 counties_per_line = 5
 # use this threshold for outages
@@ -152,10 +165,12 @@ thresh = 0.01
 
 
 # extract the data from the urls
-county_dict, text = get_data(url)
+county_dict = get_data(api_url)
+
 
 # print the top decoration text
-print_customers(text)
+
+print_customers(utl_url)
 
 # print the formatted county data
 print("\n\nCounty Outages:")
