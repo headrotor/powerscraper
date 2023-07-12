@@ -37,10 +37,6 @@ def print_formatted(county_dict, thresh, codes, counties_per_line):
     print(outline)
 
 
-def get_utility_data(utl_url):
-    """ return formatted utility name with number of customers""" 
-
-    
 def get_data(api_url):
     """get data from given url, return as dict of outage percentages
     keyed by county name"""
